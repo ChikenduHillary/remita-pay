@@ -1,85 +1,82 @@
-import { InvoiceDetails, Receipt } from '../types';
+import { RemitaDetails } from "../types";
+import { config } from "../config";
 
-// Dummy data for development
-const DUMMY_INVOICE: InvoiceDetails = {
-  rrr: '123456789012',
-  amount: 25000,
-  description: 'University Tuition Fee Payment - Computer Science Department',
-  payerName: 'John Doe',
-  payerEmail: 'john.doe@email.com',
-  merchantId: 'DEMO001',
-  serviceTypeId: 'EDU001',
-  orderId: 'ORD-2024-001',
-  status: 'PENDING',
-  currency: 'NGN',
-  dueDate: '2024-03-15',
+// remita test data for development
+const REMITA_TEST_INVOICE: RemitaDetails = {
+	billerId: "S0000573002",
+	billerName: "FEDERAL UNIVERSITY OF TECHNOLOGY, OWERRI",
+	productName: "ACCOMMODATION UNDERGRADUATE",
+	categoryId: "6",
+	categoryName: "Educational Institutions",
+	name: "Hillary Chikendu",
+	phoneNumber: "08028892288",
+	email: "hillarychikendu@gmail.com",
+	paymentIdentifier: "799068434",
+	amount: 2000,
+	fee: 0,
+	rrrAmount: 2000,
+	rrr: "210799068434",
+	currency: "NGN",
+	description: "UNDERGRADUATE ACCOMMODATION",
+	vtu: false,
+	rrrType: "PY",
+	commission: 17,
+	status: "PENDING",
+	processorId: "Remita",
+	metadata: {
+		transactionDate: "2025-10-10 00:00:00",
+		paymentDate: null,
+	},
 };
 
-const DUMMY_RECEIPT: Receipt = {
-  rrr: '123456789012',
-  transactionId: 'TXN-2024-001234',
-  amount: 25000,
-  currency: 'NGN',
-  paymentDate: new Date().toISOString(),
-  status: 'COMPLETED',
-  payerName: 'John Doe',
-  description: 'University Tuition Fee Payment - Computer Science Department',
-  merchantReference: 'REF-2024-001',
+const REMITA_TEST_RECEIPT: RemitaDetails = {
+	...REMITA_TEST_INVOICE,
+	status: "COMPLETED",
+	metadata: {
+		transactionDate: REMITA_TEST_INVOICE.metadata.transactionDate,
+		paymentDate: new Date().toISOString(),
+	},
 };
 
-export const fetchInvoiceDetails = async (rrr: string): Promise<InvoiceDetails> => {
-  // TODO: Implement actual Remita API call
-  // const response = await fetch(`${config.remita.baseUrl}/rrr/${rrr}/details`, {
-  //   headers: {
-  //     'Authorization': `Bearer ${config.remita.apiKey}`,
-  //     'Content-Type': 'application/json',
-  //   },
-  // });
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Return dummy data with the provided RRR
-  return { ...DUMMY_INVOICE, rrr };
+export const fetchInvoice = async (rrr: string): Promise<RemitaDetails> => {
+	try {
+		const urlPath = `${config.remita.baseUrl}/api/v1/biller/lookup/${rrr}`;
+
+		const response = await fetch(urlPath, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				secretKey: config.remita.apiKey,
+			},
+		});
+
+		const data = await response.json();
+
+		return data;
+	} catch (error: any) {
+		console.error("Something went wrong!", error);
+	} finally {
+		await new Promise((resolve) => setTimeout(resolve, 1500));
+		return REMITA_TEST_INVOICE;
+	}
 };
 
-export const notifyPaymentComplete = async (
-  rrr: string, 
-  transactionSignature: string,
-  amount: number
-): Promise<boolean> => {
-  // TODO: Implement actual Remita payment notification
-  // const response = await fetch(`${config.remita.baseUrl}/payment/notify`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Authorization': `Bearer ${config.remita.apiKey}`,
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify({
-  //     rrr,
-  //     transactionReference: transactionSignature,
-  //     amount,
-  //     paymentMethod: 'SOLANA_USDC',
-  //   }),
-  // });
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  return true;
-};
-
-export const fetchReceipt = async (rrr: string): Promise<Receipt> => {
-  // TODO: Implement actual Remita receipt fetch
-  // const response = await fetch(`${config.remita.baseUrl}/rrr/${rrr}/receipt`, {
-  //   headers: {
-  //     'Authorization': `Bearer ${config.remita.apiKey}`,
-  //     'Content-Type': 'application/json',
-  //   },
-  // });
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return { ...DUMMY_RECEIPT, rrr };
+export const fetchReceipt = async (rrr: string): Promise<RemitaDetails> => {
+	try {
+		const urlPath = `${config.remita.baseUrl}/api/v1/biller/lookup/${rrr}`;
+		const response = await fetch(urlPath, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				secretKey: config.remita.apiKey,
+			},
+		});
+		const data = await response.json();
+		return data;
+	} catch (error: any) {
+		console.error("Something went wrong!", error);
+	} finally {
+		await new Promise((resolve) => setTimeout(resolve, 800));
+		return REMITA_TEST_RECEIPT;
+	}
 };
