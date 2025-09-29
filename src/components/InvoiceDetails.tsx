@@ -138,7 +138,8 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
 								</p>
 							</div>
 							<p className="text-gray-900 font-mono">
-								{invoice.billerId}
+								{/* {invoice.billerId} */}
+								FUTO
 							</p>
 						</div>
 					</div>
